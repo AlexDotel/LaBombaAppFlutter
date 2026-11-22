@@ -165,5 +165,21 @@
   "needSparksForCategory": "Necesitas 10 ⚡ Chispas para crear una categoría.",
   "maxPromptsReached": "Máximo 10 consignas por categoría propia.",
   "ownPromptCountMax": "{count} / 10 consignas",
-  "@ownPromptCountMax": {"placeholders": {"count": {"type": "int"}}}
+  "@ownPromptCountMax": {"placeholders": {"count": {"type": "int"}}},
+  "addPromptCost": "Añadir consigna (5 ⚡)",
+  "needSparksForPrompt": "Necesitas 5 ⚡ Chispas para añadir una consigna.",
+  "shop": "Tienda",
+  "bombShopTitle": "Tienda de Bombas",
+  "skinMafioso": "Don Bomba",
+  "skinTattoo": "Tatuada",
+  "skinCat": "Gatito",
+  "skinPirate": "Pirata",
+  "skinNinja": "Ninja",
+  "skinKing": "Rey Dorado",
+  "skinAlien": "Alien",
+  "skinPunk": "Punk",
+  "skinViking": "Vikingo",
+  "skinPanda": "Panda",
+  "skinCyber": "Cyber Neón",
+  "skinDevil": "Diablillo"
 }

@@ -505,4 +505,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String ownPromptCountMax(int count) {
     return '$count / 10 prompts';
   }
+
+  @override
+  String get addPromptCost => 'Add prompt (5 ⚡)';
+
+  @override
+  String get needSparksForPrompt => 'You need 5 ⚡ Sparks to add a prompt.';
+
+  @override
+  String get shop => 'Shop';
+
+  @override
+  String get bombShopTitle => 'Bomb Shop';
+
+  @override
+  String get skinMafioso => 'Don Bomb';
+
+  @override
+  String get skinTattoo => 'Tattooed';
+
+  @override
+  String get skinCat => 'Kitty';
+
+  @override
+  String get skinPirate => 'Pirate';
+
+  @override
+  String get skinNinja => 'Ninja';
+
+  @override
+  String get skinKing => 'Golden King';
+
+  @override
+  String get skinAlien => 'Alien';
+
+  @override
+  String get skinPunk => 'Punk Rock';
+
+  @override
+  String get skinViking => 'Viking';
+
+  @override
+  String get skinPanda => 'Panda';
+
+  @override
+  String get skinCyber => 'Cyber Neon';
+
+  @override
+  String get skinDevil => 'Little Devil';
 }

@@ -65,11 +65,17 @@ void main() {
     expect(categories.skip(1).every((item) => item.items.length >= 10), isTrue);
     expect(specialPacks.every((item) => item.items.length >= 10), isTrue);
 
-    // Open Rewards from top sparks pill
+    // Open Rewards from top sparks pill, then open Bomb Shop from top button
     await tester.tap(find.text('20'));
     await tester.pumpAndSettle();
     expect(find.text('Recompensas'), findsOneWidget);
     expect(find.text('Gana +50 Chispas gratis'), findsOneWidget);
+    await tester.tap(find.text('Tienda'));
+    await tester.pumpAndSettle();
+    expect(find.text('Tienda de Bombas'), findsOneWidget);
+    expect(find.text('Don Bomba'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.arrow_back_rounded));
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.arrow_back_rounded));
     await tester.pumpAndSettle();
 
@@ -226,7 +232,7 @@ void main() {
     await tester.tap(find.text('Crear mía'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Añadir consigna'));
+    await tester.tap(find.text('Añadir consigna (5 ⚡)'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Animales nocturnos');
     await tester.tap(find.widgetWithText(FilledButton, 'Guardar'));
@@ -247,7 +253,7 @@ void main() {
     expect(find.text('1 / 10 consignas'), findsOneWidget);
 
     final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getInt('sparks'), 10);
+    expect(prefs.getInt('sparks'), 5);
     final custom = jsonDecode(prefs.getString('custom_categories')!) as List;
     expect(custom, hasLength(1));
 

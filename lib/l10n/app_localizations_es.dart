@@ -508,4 +508,53 @@ class AppLocalizationsEs extends AppLocalizations {
   String ownPromptCountMax(int count) {
     return '$count / 10 consignas';
   }
+
+  @override
+  String get addPromptCost => 'Añadir consigna (5 ⚡)';
+
+  @override
+  String get needSparksForPrompt =>
+      'Necesitas 5 ⚡ Chispas para añadir una consigna.';
+
+  @override
+  String get shop => 'Tienda';
+
+  @override
+  String get bombShopTitle => 'Tienda de Bombas';
+
+  @override
+  String get skinMafioso => 'Don Bomba';
+
+  @override
+  String get skinTattoo => 'Tatuada';
+
+  @override
+  String get skinCat => 'Gatito';
+
+  @override
+  String get skinPirate => 'Pirata';
+
+  @override
+  String get skinNinja => 'Ninja';
+
+  @override
+  String get skinKing => 'Rey Dorado';
+
+  @override
+  String get skinAlien => 'Alien';
+
+  @override
+  String get skinPunk => 'Punk';
+
+  @override
+  String get skinViking => 'Vikingo';
+
+  @override
+  String get skinPanda => 'Panda';
+
+  @override
+  String get skinCyber => 'Cyber Neón';
+
+  @override
+  String get skinDevil => 'Diablillo';
 }

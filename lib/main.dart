@@ -25,35 +25,82 @@ const ink = Color(0xFF11121A),
     orange = Color(0xFFFF5A36),
     muted = Color(0xFFADB0BF);
 const customCategoryCost = 10;
+const customPromptCost = 5;
 const maxCustomCategoryPrompts = 10;
 const audio = MethodChannel('labomba/audio');
 
-enum AddPromptResult { added, invalid, limitReached }
+enum AddPromptResult { added, invalid, limitReached, notEnoughSparks }
 
 enum AddCategoryResult { created, invalid, notEnoughSparks }
 
-enum BombSkin { classic, neon, dynamite, gold }
+enum BombSkin {
+  classic,
+  mafioso,
+  tattoo,
+  cat,
+  pirate,
+  ninja,
+  king,
+  alien,
+  punk,
+  viking,
+  panda,
+  cyber,
+  devil,
+}
 
 extension BombSkinMeta on BombSkin {
   int get sparkCost => switch (this) {
     BombSkin.classic => 0,
-    BombSkin.neon => 120,
-    BombSkin.dynamite => 150,
-    BombSkin.gold => 200,
+    BombSkin.mafioso => 120,
+    BombSkin.tattoo => 120,
+    BombSkin.cat => 100,
+    BombSkin.pirate => 120,
+    BombSkin.ninja => 130,
+    BombSkin.king => 200,
+    BombSkin.alien => 140,
+    BombSkin.punk => 140,
+    BombSkin.viking => 150,
+    BombSkin.panda => 100,
+    BombSkin.cyber => 160,
+    BombSkin.devil => 150,
+  };
+
+  String get assetPath => switch (this) {
+    BombSkin.classic => 'assets/branding/bomb-brand.png',
+    _ => 'assets/skins/$name.png',
   };
 
   Color get glowColor => switch (this) {
     BombSkin.classic => orange,
-    BombSkin.neon => const Color(0xFF22D3EE),
-    BombSkin.dynamite => const Color(0xFFEF4444),
-    BombSkin.gold => yellow,
+    BombSkin.mafioso => yellow,
+    BombSkin.tattoo => orange,
+    BombSkin.cat => yellow,
+    BombSkin.pirate => const Color(0xFFEF4444),
+    BombSkin.ninja => const Color(0xFFEF4444),
+    BombSkin.king => yellow,
+    BombSkin.alien => const Color(0xFF22C55E),
+    BombSkin.punk => orange,
+    BombSkin.viking => orange,
+    BombSkin.panda => yellow,
+    BombSkin.cyber => const Color(0xFF22D3EE),
+    BombSkin.devil => const Color(0xFFEF4444),
   };
 
   String localizedName(BuildContext context) => switch (this) {
     BombSkin.classic => context.l10n.skinClassic,
-    BombSkin.neon => context.l10n.skinNeon,
-    BombSkin.dynamite => context.l10n.skinDynamite,
-    BombSkin.gold => context.l10n.skinGold,
+    BombSkin.mafioso => context.l10n.skinMafioso,
+    BombSkin.tattoo => context.l10n.skinTattoo,
+    BombSkin.cat => context.l10n.skinCat,
+    BombSkin.pirate => context.l10n.skinPirate,
+    BombSkin.ninja => context.l10n.skinNinja,
+    BombSkin.king => context.l10n.skinKing,
+    BombSkin.alien => context.l10n.skinAlien,
+    BombSkin.punk => context.l10n.skinPunk,
+    BombSkin.viking => context.l10n.skinViking,
+    BombSkin.panda => context.l10n.skinPanda,
+    BombSkin.cyber => context.l10n.skinCyber,
+    BombSkin.devil => context.l10n.skinDevil,
   };
 }
 
@@ -580,6 +627,7 @@ enum Screen {
   playing,
   exploded,
   rewards,
+  shop,
   settings,
   content,
 }
@@ -849,6 +897,7 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
     String categoryName,
     String value,
   ) async {
+    if (sparks < customPromptCost) return AddPromptResult.notEnoughSparks;
     final clean = value.trim();
     if (clean.isEmpty) return AddPromptResult.invalid;
     final customIndex = customCategories.indexWhere(
@@ -875,8 +924,9 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
       }
       values.add(clean);
     }
+    sparks -= customPromptCost;
     setState(() {});
-    await _saveCustomContent();
+    await Future.wait([_saveCustomContent(), _saveRewardsState()]);
     return AddPromptResult.added;
   }
 
@@ -1380,6 +1430,7 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
       if (!did) {
         leave(switch (screen) {
           Screen.content => contentReturnScreen,
+          Screen.shop => Screen.rewards,
           _ => Screen.home,
         });
       }
@@ -1456,14 +1507,20 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
                   key: const ValueKey('rewards'),
                   sparks: sparks,
                   packs: specialPacks,
-                  equippedSkin: equippedSkin,
                   isPackUnlocked: isPackUnlocked,
                   isPackTempActive: isPackTempActive,
-                  isSkinUnlocked: isSkinUnlocked,
                   back: () => setState(() => screen = Screen.home),
+                  openShop: () => setState(() => screen = Screen.shop),
                   watchAdSparks: () => watchAdForSparks(50),
                   unlockPackAd: unlockPackWithAd,
                   unlockPackSparks: unlockPackWithSparks,
+                ),
+                Screen.shop => BombShopScreen(
+                  key: const ValueKey('shop'),
+                  sparks: sparks,
+                  equippedSkin: equippedSkin,
+                  isSkinUnlocked: isSkinUnlocked,
+                  back: () => setState(() => screen = Screen.rewards),
                   onSelectSkin: selectOrUnlockSkin,
                 ),
                 Screen.settings => Settings(
@@ -2491,27 +2548,22 @@ class RewardsScreen extends StatelessWidget {
   const RewardsScreen({
     required this.sparks,
     required this.packs,
-    required this.equippedSkin,
     required this.isPackUnlocked,
     required this.isPackTempActive,
-    required this.isSkinUnlocked,
     required this.back,
+    required this.openShop,
     required this.watchAdSparks,
     required this.unlockPackAd,
     required this.unlockPackSparks,
-    required this.onSelectSkin,
     super.key,
   });
 
   final int sparks;
   final List<Category> packs;
-  final BombSkin equippedSkin;
   final bool Function(String? packId) isPackUnlocked;
   final bool Function(String packId) isPackTempActive;
-  final bool Function(BombSkin skin) isSkinUnlocked;
-  final VoidCallback back, watchAdSparks;
+  final VoidCallback back, openShop, watchAdSparks;
   final ValueChanged<Category> unlockPackAd, unlockPackSparks;
-  final Future<void> Function(BombSkin skin, {bool withAd}) onSelectSkin;
 
   @override
   Widget build(BuildContext context) {
@@ -2520,7 +2572,7 @@ class RewardsScreen extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 20, 6),
+          padding: const EdgeInsets.fromLTRB(12, 10, 16, 6),
           child: Row(
             children: [
               IconButton(
@@ -2530,15 +2582,37 @@ class RewardsScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   context.l10n.rewards,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 23,
+                    fontSize: 22,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
+              FilledButton.icon(
+                onPressed: openShop,
+                style: FilledButton.styleFrom(
+                  backgroundColor: yellow,
+                  foregroundColor: ink,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  visualDensity: VisualDensity.compact,
+                ),
+                icon: const Icon(Icons.storefront_rounded, size: 17),
+                label: Text(
+                  context.l10n.shop,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12.5,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
+                  horizontal: 11,
                   vertical: 7,
                 ),
                 decoration: BoxDecoration(
@@ -2550,6 +2624,7 @@ class RewardsScreen extends StatelessWidget {
                   '⚡ $sparks',
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
+                    fontSize: 13,
                     color: isLight ? const Color(0xFF9A5A00) : yellow,
                   ),
                 ),
@@ -2715,114 +2790,181 @@ class RewardsScreen extends StatelessWidget {
                   ),
                 );
               }),
-              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
-              // Bomb Skins
-              Text(
-                context.l10n.bombSkins,
-                style: TextStyle(
-                  color: colors.onSurfaceVariant,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.3,
+class BombShopScreen extends StatelessWidget {
+  const BombShopScreen({
+    required this.sparks,
+    required this.equippedSkin,
+    required this.isSkinUnlocked,
+    required this.back,
+    required this.onSelectSkin,
+    super.key,
+  });
+
+  final int sparks;
+  final BombSkin equippedSkin;
+  final bool Function(BombSkin skin) isSkinUnlocked;
+  final VoidCallback back;
+  final Future<void> Function(BombSkin skin, {bool withAd}) onSelectSkin;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 20, 6),
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: back,
+                icon: const Icon(Icons.arrow_back_rounded),
+              ),
+              Expanded(
+                child: Text(
+                  context.l10n.bombShopTitle,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 0.92,
-                children: BombSkin.values.map((skin) {
-                  final unlocked = isSkinUnlocked(skin);
-                  final isEquipped = equippedSkin == skin;
-                  return Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isEquipped ? yellow : colors.outline,
-                        width: isEquipped ? 2 : 1,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        BombImage(size: 62, skin: skin),
-                        Text(
-                          skin.localizedName(context),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 14,
-                          ),
-                        ),
-                        if (isEquipped)
-                          Text(
-                            context.l10n.equipped,
-                            style: TextStyle(
-                              color: isLight
-                                  ? const Color(0xFF9A5A00)
-                                  : yellow,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 12,
-                            ),
-                          )
-                        else if (unlocked)
-                          SizedBox(
-                            width: double.infinity,
-                            child: FilledButton.tonal(
-                              onPressed: () => onSelectSkin(skin),
-                              child: Text(context.l10n.equip),
-                            ),
-                          )
-                        else
-                          Row(
-                            children: [
-                              Expanded(
-                                child: FilledButton(
-                                  onPressed: () =>
-                                      onSelectSkin(skin, withAd: true),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: yellow,
-                                    foregroundColor: ink,
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  child: const Text(
-                                    '▶ 24h',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () => onSelectSkin(skin),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  child: Text(
-                                    '⚡${skin.sparkCost}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(99),
+                  border: Border.all(color: yellow.withValues(alpha: 0.6)),
+                ),
+                child: Text(
+                  '⚡ $sparks',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    color: isLight ? const Color(0xFF9A5A00) : yellow,
+                  ),
+                ),
               ),
             ],
+          ),
+        ),
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
+            itemCount: BombSkin.values.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.84,
+            ),
+            itemBuilder: (_, index) {
+              final skin = BombSkin.values[index];
+              final unlocked = isSkinUnlocked(skin);
+              final isEquipped = equippedSkin == skin;
+              return Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(
+                    color: isEquipped ? yellow : colors.outline,
+                    width: isEquipped ? 2 : 1,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    BombImage(size: 86, skin: skin),
+                    Text(
+                      skin.localizedName(context),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                      ),
+                    ),
+                    if (isEquipped)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: yellow.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                        child: Text(
+                          context.l10n.equipped,
+                          style: TextStyle(
+                            color: isLight ? const Color(0xFF9A5A00) : yellow,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 11.5,
+                          ),
+                        ),
+                      )
+                    else if (unlocked)
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.tonal(
+                          onPressed: () => onSelectSkin(skin),
+                          child: Text(context.l10n.equip),
+                        ),
+                      )
+                    else
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: () => onSelectSkin(skin, withAd: true),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: yellow,
+                                foregroundColor: ink,
+                                padding: EdgeInsets.zero,
+                              ),
+                              child: const Text(
+                                '▶ 24h',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => onSelectSkin(skin),
+                              style: OutlinedButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                              ),
+                              child: Text(
+                                '⚡${skin.sparkCost}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -2924,13 +3066,17 @@ class _ContentManagerState extends State<ContentManager> {
 
   Future<void> addChallenge() async {
     final strings = context.l10n;
+    if (widget.sparks < customPromptCost) {
+      message(strings.needSparksForPrompt);
+      return;
+    }
     var selected = widget.categories.first.name;
     final controller = TextEditingController();
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: Text(strings.newPrompt),
+          title: Text(strings.addPromptCost),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -2984,6 +3130,7 @@ class _ContentManagerState extends State<ContentManager> {
     message(switch (saved) {
       AddPromptResult.added => strings.promptAdded,
       AddPromptResult.limitReached => strings.maxPromptsReached,
+      AddPromptResult.notEnoughSparks => strings.needSparksForPrompt,
       AddPromptResult.invalid => strings.newPromptRequired,
     });
   }
@@ -3140,7 +3287,7 @@ class _ContentManagerState extends State<ContentManager> {
               ),
               const SizedBox(height: 24),
               BigButton(
-                label: context.l10n.addPrompt,
+                label: context.l10n.addPromptCost,
                 icon: Icons.add_rounded,
                 onTap: addChallenge,
               ),
@@ -3559,60 +3706,41 @@ class BombImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final base = Image.asset(
-      'assets/branding/bomb-brand.png',
+    if (skin == BombSkin.classic) {
+      return Image.asset(
+        skin.assetPath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+      );
+    }
+    return Container(
       width: size,
       height: size,
-      fit: BoxFit.contain,
-      filterQuality: FilterQuality.high,
-    );
-    return switch (skin) {
-      BombSkin.classic => base,
-      BombSkin.neon => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF22D3EE).withValues(alpha: 0.45),
-              blurRadius: size * 0.22,
-            ),
-          ],
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: ink,
+        border: Border.all(
+          color: skin.glowColor.withValues(alpha: 0.55),
+          width: size > 60 ? 2 : 1.2,
         ),
-        child: ColorFiltered(
-          colorFilter: const ColorFilter.mode(
-            Color(0xFF22D3EE),
-            BlendMode.modulate,
+        boxShadow: [
+          BoxShadow(
+            color: skin.glowColor.withValues(alpha: 0.28),
+            blurRadius: size * 0.18,
           ),
-          child: base,
-        ),
+        ],
       ),
-      BombSkin.dynamite => SizedBox(
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        skin.assetPath,
         width: size,
         height: size,
-        child: Center(
-          child: Text('🧨', style: TextStyle(fontSize: size * 0.72)),
-        ),
+        fit: BoxFit.cover,
+        filterQuality: FilterQuality.high,
       ),
-      BombSkin.gold => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: yellow.withValues(alpha: 0.45),
-              blurRadius: size * 0.22,
-            ),
-          ],
-        ),
-        child: ColorFiltered(
-          colorFilter: const ColorFilter.mode(yellow, BlendMode.modulate),
-          child: base,
-        ),
-      ),
-    };
+    );
   }
 }
 

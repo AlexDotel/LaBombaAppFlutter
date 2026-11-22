@@ -152,5 +152,21 @@
   "createCategoryCost": "Create category (10 ⚡)",
   "needSparksForCategory": "You need 10 ⚡ Sparks to create a category.",
   "maxPromptsReached": "Maximum 10 prompts per custom category.",
-  "ownPromptCountMax": "{count} / 10 prompts"
+  "ownPromptCountMax": "{count} / 10 prompts",
+  "addPromptCost": "Add prompt (5 ⚡)",
+  "needSparksForPrompt": "You need 5 ⚡ Sparks to add a prompt.",
+  "shop": "Shop",
+  "bombShopTitle": "Bomb Shop",
+  "skinMafioso": "Don Bomb",
+  "skinTattoo": "Tattooed",
+  "skinCat": "Kitty",
+  "skinPirate": "Pirate",
+  "skinNinja": "Ninja",
+  "skinKing": "Golden King",
+  "skinAlien": "Alien",
+  "skinPunk": "Punk Rock",
+  "skinViking": "Viking",
+  "skinPanda": "Panda",
+  "skinCyber": "Cyber Neon",
+  "skinDevil": "Little Devil"
 }

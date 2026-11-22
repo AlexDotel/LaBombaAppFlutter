@@ -1021,6 +1021,102 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{count} / 10 consignas'**
   String ownPromptCountMax(int count);
+
+  /// No description provided for @addPromptCost.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir consigna (5 ⚡)'**
+  String get addPromptCost;
+
+  /// No description provided for @needSparksForPrompt.
+  ///
+  /// In es, this message translates to:
+  /// **'Necesitas 5 ⚡ Chispas para añadir una consigna.'**
+  String get needSparksForPrompt;
+
+  /// No description provided for @shop.
+  ///
+  /// In es, this message translates to:
+  /// **'Tienda'**
+  String get shop;
+
+  /// No description provided for @bombShopTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tienda de Bombas'**
+  String get bombShopTitle;
+
+  /// No description provided for @skinMafioso.
+  ///
+  /// In es, this message translates to:
+  /// **'Don Bomba'**
+  String get skinMafioso;
+
+  /// No description provided for @skinTattoo.
+  ///
+  /// In es, this message translates to:
+  /// **'Tatuada'**
+  String get skinTattoo;
+
+  /// No description provided for @skinCat.
+  ///
+  /// In es, this message translates to:
+  /// **'Gatito'**
+  String get skinCat;
+
+  /// No description provided for @skinPirate.
+  ///
+  /// In es, this message translates to:
+  /// **'Pirata'**
+  String get skinPirate;
+
+  /// No description provided for @skinNinja.
+  ///
+  /// In es, this message translates to:
+  /// **'Ninja'**
+  String get skinNinja;
+
+  /// No description provided for @skinKing.
+  ///
+  /// In es, this message translates to:
+  /// **'Rey Dorado'**
+  String get skinKing;
+
+  /// No description provided for @skinAlien.
+  ///
+  /// In es, this message translates to:
+  /// **'Alien'**
+  String get skinAlien;
+
+  /// No description provided for @skinPunk.
+  ///
+  /// In es, this message translates to:
+  /// **'Punk'**
+  String get skinPunk;
+
+  /// No description provided for @skinViking.
+  ///
+  /// In es, this message translates to:
+  /// **'Vikingo'**
+  String get skinViking;
+
+  /// No description provided for @skinPanda.
+  ///
+  /// In es, this message translates to:
+  /// **'Panda'**
+  String get skinPanda;
+
+  /// No description provided for @skinCyber.
+  ///
+  /// In es, this message translates to:
+  /// **'Cyber Neón'**
+  String get skinCyber;
+
+  /// No description provided for @skinDevil.
+  ///
+  /// In es, this message translates to:
+  /// **'Diablillo'**
+  String get skinDevil;
 }
 
 class _AppLocalizationsDelegate
