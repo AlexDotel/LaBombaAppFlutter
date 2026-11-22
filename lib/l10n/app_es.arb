@@ -160,5 +160,10 @@
   "skinDynamite": "Dinamita",
   "skinGold": "Dorada",
   "packPromptCount": "{count} consignas exclusivas",
-  "@packPromptCount": {"placeholders": {"count": {"type": "int"}}}
+  "@packPromptCount": {"placeholders": {"count": {"type": "int"}}},
+  "createCategoryCost": "Crear categoría (10 ⚡)",
+  "needSparksForCategory": "Necesitas 10 ⚡ Chispas para crear una categoría.",
+  "maxPromptsReached": "Máximo 10 consignas por categoría propia.",
+  "ownPromptCountMax": "{count} / 10 consignas",
+  "@ownPromptCountMax": {"placeholders": {"count": {"type": "int"}}}
 }

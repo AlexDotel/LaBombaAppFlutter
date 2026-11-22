@@ -234,7 +234,7 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Consigna añadida'), findsOneWidget);
 
-    await tester.tap(find.text('Crear categoría'));
+    await tester.tap(find.text('Crear categoría (10 ⚡)'));
     await tester.pumpAndSettle();
     final fields = find.byType(TextField);
     await tester.enterText(fields.at(0), 'Espacio');
@@ -244,8 +244,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     expect(find.text('Espacio'), findsWidgets);
+    expect(find.text('1 / 10 consignas'), findsOneWidget);
 
     final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getInt('sparks'), 10);
     final custom = jsonDecode(prefs.getString('custom_categories')!) as List;
     expect(custom, hasLength(1));
 
@@ -273,6 +275,38 @@ void main() {
         jsonDecode(prefs.getString('custom_categories')!) as List;
     expect(remainingCategories, isEmpty);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('ordena categorías según uso manual y limita consignas propias', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'tutorial_seen': true,
+      'language': 'es',
+      'sparks': 5,
+      'category_usage': jsonEncode({'Comida': 5, 'Música': 2}),
+    });
+    tester.view.physicalSize = const Size(430, 932);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const BombApp());
+    await tester.pumpAndSettle();
+
+    // Comida (5 uses) should appear before Animales (0 uses)
+    final comidaPos = tester.getTopLeft(find.text('Comida'));
+    final animalesPos = tester.getTopLeft(find.text('Animales'));
+    expect(comidaPos.dy, lessThanOrEqualTo(animalesPos.dy));
+
+    // With only 5 sparks, creating a category is blocked
+    await tester.tap(find.text('Crear mía'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Crear categoría (10 ⚡)'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Necesitas 10 ⚡ Chispas para crear una categoría.'),
+      findsOneWidget,
+    );
   });
 }
 

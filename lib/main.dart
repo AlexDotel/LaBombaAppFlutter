@@ -24,7 +24,13 @@ const ink = Color(0xFF11121A),
     yellow = Color(0xFFFFCC4D),
     orange = Color(0xFFFF5A36),
     muted = Color(0xFFADB0BF);
+const customCategoryCost = 10;
+const maxCustomCategoryPrompts = 10;
 const audio = MethodChannel('labomba/audio');
+
+enum AddPromptResult { added, invalid, limitReached }
+
+enum AddCategoryResult { created, invalid, notEnoughSparks }
 
 enum BombSkin { classic, neon, dynamite, gold }
 
@@ -606,6 +612,7 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
   final customItems = <String, List<String>>{};
   final customCategories = <Category>[];
   final favoriteCategories = <String>{};
+  final categoryUsage = <String, int>{};
   final permUnlockedPacks = <String>{};
   final tempUnlockedPacks = <String, int>{};
   final permUnlockedSkins = <String>{BombSkin.classic.name};
@@ -678,6 +685,13 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
     favoriteCategories.addAll(
       prefs.getStringList('favorite_categories') ?? const [],
     );
+    final rawUsage = prefs.getString('category_usage');
+    if (rawUsage != null) {
+      final decoded = jsonDecode(rawUsage) as Map<String, dynamic>;
+      for (final entry in decoded.entries) {
+        categoryUsage[entry.key] = (entry.value as num).toInt();
+      }
+    }
     permUnlockedPacks.addAll(
       prefs.getStringList('unlocked_packs_perm') ?? const [],
     );
@@ -831,18 +845,24 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
     );
   }
 
-  Future<bool> addChallenge(String categoryName, String value) async {
+  Future<AddPromptResult> addChallenge(
+    String categoryName,
+    String value,
+  ) async {
     final clean = value.trim();
-    if (clean.isEmpty) return false;
+    if (clean.isEmpty) return AddPromptResult.invalid;
     final customIndex = customCategories.indexWhere(
       (item) => item.name == categoryName,
     );
     if (customIndex >= 0) {
       final current = customCategories[customIndex];
+      if (current.items.length >= maxCustomCategoryPrompts) {
+        return AddPromptResult.limitReached;
+      }
       if (current.items.any(
         (item) => item.toLowerCase() == clean.toLowerCase(),
       )) {
-        return false;
+        return AddPromptResult.invalid;
       }
       customCategories[customIndex] = Category(current.name, current.emoji, [
         ...current.items,
@@ -851,37 +871,48 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
     } else {
       final values = customItems.putIfAbsent(categoryName, () => []);
       if (values.any((item) => item.toLowerCase() == clean.toLowerCase())) {
-        return false;
+        return AddPromptResult.invalid;
       }
       values.add(clean);
     }
     setState(() {});
     await _saveCustomContent();
-    return true;
+    return AddPromptResult.added;
   }
 
-  Future<bool> addCategory(String name, String emoji, String firstItem) async {
+  Future<AddCategoryResult> addCategory(
+    String name,
+    String emoji,
+    String firstItem,
+  ) async {
+    if (sparks < customCategoryCost) {
+      return AddCategoryResult.notEnoughSparks;
+    }
     final cleanName = name.trim();
     final cleanItem = firstItem.trim();
-    if (cleanName.isEmpty || cleanItem.isEmpty) return false;
+    if (cleanName.isEmpty || cleanItem.isEmpty) {
+      return AddCategoryResult.invalid;
+    }
     if (availableCategories.any(
       (item) => item.name.toLowerCase() == cleanName.toLowerCase(),
     )) {
-      return false;
+      return AddCategoryResult.invalid;
     }
+    sparks -= customCategoryCost;
     customCategories.add(
       Category(cleanName, emoji.trim().isEmpty ? '🎯' : emoji.trim(), [
         cleanItem,
       ], custom: true),
     );
     setState(() {});
-    await _saveCustomContent();
-    return true;
+    await Future.wait([_saveCustomContent(), _saveRewardsState()]);
+    return AddCategoryResult.created;
   }
 
   Future<void> removeCategory(String categoryName) async {
     customCategories.removeWhere((item) => item.name == categoryName);
     favoriteCategories.remove(categoryName);
+    categoryUsage.remove(categoryName);
     usedChallenges.removeWhere((key) => key.startsWith('$categoryName::'));
     setState(() {});
     final prefs = await SharedPreferences.getInstance();
@@ -889,6 +920,7 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
       _saveCustomContent(),
       _saveHistory(),
       prefs.setStringList('favorite_categories', favoriteCategories.toList()),
+      prefs.setString('category_usage', jsonEncode(categoryUsage)),
     ]);
   }
 
@@ -1114,6 +1146,12 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
   Future<void> openStore(String packageName) =>
       invoke('openStore', {'package': packageName});
 
+  Future<void> _recordCategoryUsage(String categoryName) async {
+    categoryUsage[categoryName] = (categoryUsage[categoryName] ?? 0) + 1;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('category_usage', jsonEncode(categoryUsage));
+  }
+
   Future<void> chooseAndStart(Category c) async {
     await historyReady;
     if (!mounted) return;
@@ -1135,6 +1173,7 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
           : available[random.nextInt(available.length)];
     } else {
       category = c;
+      unawaited(_recordCategoryUsage(c.name));
     }
     beginCountdown();
   }
@@ -1361,6 +1400,7 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
                   key: const ValueKey('home'),
                   categories: availableCategories.skip(1).toList(),
                   favorites: favoriteCategories,
+                  categoryUsage: categoryUsage,
                   filter: categoryFilter,
                   onFilterChanged: (f) => setState(() => categoryFilter = f),
                   isPackUnlocked: isPackUnlocked,
@@ -1455,6 +1495,8 @@ class _GameState extends State<Game> with WidgetsBindingObserver {
                 Screen.content => ContentManager(
                   key: const ValueKey('content'),
                   categories: availableCategories.skip(1).toList(),
+                  sparks: sparks,
+                  openRewards: () => setState(() => screen = Screen.rewards),
                   back: () => setState(() => screen = contentReturnScreen),
                   addChallenge: addChallenge,
                   addCategory: addCategory,
@@ -1643,6 +1685,7 @@ class Home extends StatelessWidget {
   const Home({
     required this.categories,
     required this.favorites,
+    required this.categoryUsage,
     required this.filter,
     required this.onFilterChanged,
     required this.isPackUnlocked,
@@ -1664,6 +1707,7 @@ class Home extends StatelessWidget {
 
   final List<Category> categories;
   final Set<String> favorites;
+  final Map<String, int> categoryUsage;
   final CategoryFilter filter;
   final ValueChanged<CategoryFilter> onFilterChanged;
   final bool Function(String? packId) isPackUnlocked;
@@ -1675,6 +1719,17 @@ class Home extends StatelessWidget {
   final bool light;
   final BombSkin skin;
 
+  List<Category> _sortByUsage(List<Category> list) {
+    final indexed = list.indexed.toList();
+    indexed.sort((a, b) {
+      final ua = categoryUsage[a.$2.name] ?? 0;
+      final ub = categoryUsage[b.$2.name] ?? 0;
+      if (ub != ua) return ub.compareTo(ua);
+      return a.$1.compareTo(b.$1);
+    });
+    return indexed.map((e) => e.$2).toList();
+  }
+
   List<Category> _filteredCategories() {
     final base = switch (filter) {
       CategoryFilter.all => categories,
@@ -1683,11 +1738,24 @@ class Home extends StatelessWidget {
       CategoryFilter.mine => categories.where((c) => c.custom).toList(),
     };
     if (filter == CategoryFilter.all) {
-      final favs = base.where((c) => favorites.contains(c.name)).toList();
-      final rest = base.where((c) => !favorites.contains(c.name)).toList();
-      return [...favs, ...rest];
+      final favs = _sortByUsage(
+        base.where((c) => favorites.contains(c.name)).toList(),
+      );
+      final unlockedRest = _sortByUsage(
+        base
+            .where(
+              (c) => !favorites.contains(c.name) && isPackUnlocked(c.packId),
+            )
+            .toList(),
+      );
+      final lockedRest = base
+          .where(
+            (c) => !favorites.contains(c.name) && !isPackUnlocked(c.packId),
+          )
+          .toList();
+      return [...favs, ...unlockedRest, ...lockedRest];
     }
-    return base;
+    return _sortByUsage(base);
   }
 
   @override
@@ -2765,6 +2833,8 @@ class RewardsScreen extends StatelessWidget {
 class ContentManager extends StatefulWidget {
   const ContentManager({
     required this.categories,
+    required this.sparks,
+    required this.openRewards,
     required this.back,
     required this.addChallenge,
     required this.addCategory,
@@ -2775,9 +2845,16 @@ class ContentManager extends StatefulWidget {
     super.key,
   });
   final List<Category> categories;
+  final int sparks;
+  final VoidCallback openRewards;
   final VoidCallback back;
-  final Future<bool> Function(String category, String value) addChallenge;
-  final Future<bool> Function(String name, String emoji, String firstItem)
+  final Future<AddPromptResult> Function(String category, String value)
+  addChallenge;
+  final Future<AddCategoryResult> Function(
+    String name,
+    String emoji,
+    String firstItem,
+  )
   addCategory;
   final Map<String, List<String>> customItems;
   final List<Category> customCategories;
@@ -2904,18 +2981,26 @@ class _ContentManagerState extends State<ContentManager> {
     if (result != true || !mounted) return;
     final saved = await widget.addChallenge(selected, value);
     if (!mounted) return;
-    message(saved ? strings.promptAdded : strings.newPromptRequired);
+    message(switch (saved) {
+      AddPromptResult.added => strings.promptAdded,
+      AddPromptResult.limitReached => strings.maxPromptsReached,
+      AddPromptResult.invalid => strings.newPromptRequired,
+    });
   }
 
   Future<void> addCategory() async {
     final strings = context.l10n;
+    if (widget.sparks < customCategoryCost) {
+      message(strings.needSparksForCategory);
+      return;
+    }
     final name = TextEditingController();
     final emoji = TextEditingController(text: '🎯');
     final firstItem = TextEditingController();
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(strings.createCategory),
+        title: Text(strings.createCategoryCost),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -2965,7 +3050,11 @@ class _ContentManagerState extends State<ContentManager> {
       categoryItem,
     );
     if (!mounted) return;
-    message(saved ? strings.categoryCreated : strings.categoryReview);
+    message(switch (saved) {
+      AddCategoryResult.created => strings.categoryCreated,
+      AddCategoryResult.notEnoughSparks => strings.needSparksForCategory,
+      AddCategoryResult.invalid => strings.categoryReview,
+    });
   }
 
   @override
@@ -2984,9 +3073,54 @@ class _ContentManagerState extends State<ContentManager> {
         for (final prompt in category.items)
           (category: category.name, emoji: category.emoji, prompt: prompt),
     ];
+    final colors = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return Column(
       children: [
-        Header(title: context.l10n.yourContent, back: widget.back),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 20, 6),
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: widget.back,
+                icon: const Icon(Icons.arrow_back_rounded),
+              ),
+              Expanded(
+                child: Text(
+                  context.l10n.yourContent,
+                  style: const TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              Material(
+                color: colors.surface,
+                shape: StadiumBorder(
+                  side: BorderSide(color: yellow.withValues(alpha: 0.65)),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: widget.openRewards,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 11,
+                      vertical: 7,
+                    ),
+                    child: Text(
+                      '⚡ ${widget.sparks}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                        color: isLight ? const Color(0xFF9A5A00) : yellow,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.all(24),
@@ -3014,7 +3148,7 @@ class _ContentManagerState extends State<ContentManager> {
               OutlinedButton.icon(
                 onPressed: addCategory,
                 icon: const Icon(Icons.create_new_folder_rounded),
-                label: Text(context.l10n.createCategory),
+                label: Text(context.l10n.createCategoryCost),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(58),
                   shape: RoundedRectangleBorder(
@@ -3046,7 +3180,7 @@ class _ContentManagerState extends State<ContentManager> {
                           style: const TextStyle(fontWeight: FontWeight.w800),
                         ),
                         subtitle: Text(
-                          context.l10n.ownPromptCount(item.items.length),
+                          context.l10n.ownPromptCountMax(item.items.length),
                         ),
                         trailing: IconButton(
                           key: ValueKey('delete-category-${item.name}'),

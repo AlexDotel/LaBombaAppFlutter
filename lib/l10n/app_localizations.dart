@@ -997,6 +997,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'{count} consignas exclusivas'**
   String packPromptCount(int count);
+
+  /// No description provided for @createCategoryCost.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear categoría (10 ⚡)'**
+  String get createCategoryCost;
+
+  /// No description provided for @needSparksForCategory.
+  ///
+  /// In es, this message translates to:
+  /// **'Necesitas 10 ⚡ Chispas para crear una categoría.'**
+  String get needSparksForCategory;
+
+  /// No description provided for @maxPromptsReached.
+  ///
+  /// In es, this message translates to:
+  /// **'Máximo 10 consignas por categoría propia.'**
+  String get maxPromptsReached;
+
+  /// No description provided for @ownPromptCountMax.
+  ///
+  /// In es, this message translates to:
+  /// **'{count} / 10 consignas'**
+  String ownPromptCountMax(int count);
 }
 
 class _AppLocalizationsDelegate

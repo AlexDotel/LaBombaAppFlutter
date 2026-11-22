@@ -148,5 +148,9 @@
   "skinNeon": "Neon",
   "skinDynamite": "Dynamite",
   "skinGold": "Golden",
-  "packPromptCount": "{count} exclusive prompts"
+  "packPromptCount": "{count} exclusive prompts",
+  "createCategoryCost": "Create category (10 ⚡)",
+  "needSparksForCategory": "You need 10 ⚡ Sparks to create a category.",
+  "maxPromptsReached": "Maximum 10 prompts per custom category.",
+  "ownPromptCountMax": "{count} / 10 prompts"
 }

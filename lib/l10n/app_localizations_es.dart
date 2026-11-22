@@ -493,4 +493,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String packPromptCount(int count) {
     return '$count consignas exclusivas';
   }
+
+  @override
+  String get createCategoryCost => 'Crear categoría (10 ⚡)';
+
+  @override
+  String get needSparksForCategory =>
+      'Necesitas 10 ⚡ Chispas para crear una categoría.';
+
+  @override
+  String get maxPromptsReached => 'Máximo 10 consignas por categoría propia.';
+
+  @override
+  String ownPromptCountMax(int count) {
+    return '$count / 10 consignas';
+  }
 }
