@@ -15,5 +15,8 @@ Author: Spring Spring
 Source: https://opengameart.org/content/mechanical-explosion
 License: Creative Commons Zero (CC0)
 
+bomb_explosion_loud.wav is a gain-adjusted and peak-limited PCM derivative
+of bomb_explosion.wav used to improve audibility on phone speakers.
+
 Both works may be copied, modified and distributed, including commercially,
 without attribution. Credits are included here as a courtesy.

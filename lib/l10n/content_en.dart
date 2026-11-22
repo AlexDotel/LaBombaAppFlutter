@@ -1,0 +1,411 @@
+import 'package:flutter/widgets.dart';
+
+const _contentEn = <String, String>{
+  // Categories
+  'Al azar': 'Random',
+  'Animales': 'Animals',
+  'Ciudades': 'Cities',
+  'Países': 'Countries',
+  'Comida': 'Food',
+  'Objetos': 'Objects',
+  'Películas': 'Movies',
+  'Series': 'TV shows',
+  'Música': 'Music',
+  'Deportes': 'Sports',
+  'Profesiones': 'Jobs',
+  'Marcas': 'Brands',
+  'Tecnología': 'Technology',
+  'Naturaleza': 'Nature',
+  'Viajes': 'Travel',
+  'Casa': 'Home',
+  'Colegio': 'School',
+  'Fiesta': 'Party',
+  'Famosos': 'Famous people',
+  'Palabras': 'Words',
+  'Cuerpo': 'Body',
+  'Ropa': 'Clothing',
+  'Vehículos': 'Vehicles',
+  'Fantasía': 'Fantasy',
+  'Verano': 'Summer',
+  'Navidad': 'Christmas',
+  'Fiesta +18': 'Party +18',
+  'Gamers': 'Gamers & Geek',
+  'Cine Pro': 'Cinema Pro',
+  'Fútbol': 'Football',
+
+  // Animales
+  'Animales marinos': 'Sea animals',
+  'Animales que vuelan': 'Animals that fly',
+  'Animales de granja': 'Farm animals',
+  'Animales salvajes': 'Wild animals',
+  'Animales con cuatro patas': 'Four-legged animals',
+  'Animales domésticos': 'Pets & domestic animals',
+  'Insectos y bichos': 'Insects & bugs',
+  'Animales de África': 'Animals from Africa',
+  'Animales pequeños': 'Small animals',
+  'Animales peligrosos': 'Dangerous animals',
+
+  // Ciudades
+  'Ciudades españolas': 'Spanish cities',
+  'Capitales europeas': 'European capitals',
+  'Ciudades con playa': 'Beach cities',
+  'Ciudades de América': 'Cities in the Americas',
+  'Ciudades de Italia': 'Cities in Italy',
+  'Ciudades muy turísticas': 'Famous tourist cities',
+  'Ciudades de Francia': 'Cities in France',
+  'Capitales del mundo': 'World capitals',
+  'Ciudades con metro': 'Cities with a subway',
+  'Ciudades donde irías de vacaciones': 'Cities you would visit on vacation',
+
+  // Países
+  'Países de Europa': 'European countries',
+  'Países de América': 'Countries in the Americas',
+  'Países con costa': 'Countries with a coastline',
+  'Países de Asia': 'Countries in Asia',
+  'Países cálidos': 'Warm countries',
+  'Países donde se habla español': 'Spanish-speaking countries',
+  'Países donde se habla inglés': 'English-speaking countries',
+  'Países de África': 'Countries in Africa',
+  'Países con nieve': 'Countries where it snows',
+  'Países famosos por su comida': 'Countries famous for their food',
+
+  // Comida
+  'Frutas': 'Fruits',
+  'Postres': 'Desserts',
+  'Comidas con queso': 'Foods with cheese',
+  'Platos fríos': 'Cold dishes',
+  'Comidas de otros países': 'Foods from other countries',
+  'Verduras y hortalizas': 'Vegetables',
+  'Desayunos': 'Breakfast foods',
+  'Comida rápida': 'Fast food',
+  'Snacks y aperitivos': 'Snacks & appetizers',
+  'Ingredientes de una pizza': 'Pizza toppings',
+
+  // Objetos
+  'Objetos de cocina': 'Kitchen objects',
+  'Objetos con ruedas': 'Objects with wheels',
+  'Objetos de un colegio': 'Objects found at school',
+  'Objetos que caben en un bolsillo': 'Objects that fit in a pocket',
+  'Objetos de metal': 'Metal objects',
+  'Objetos de plástico': 'Plastic objects',
+  'Objetos que necesitan pilas o batería': 'Battery-powered objects',
+  'Objetos con botones': 'Objects with buttons',
+  'Objetos de cristal': 'Glass objects',
+  'Objetos que llevas en el bolso o mochila': 'Things in a bag or backpack',
+
+  // Películas
+  'Películas de animación': 'Animated movies',
+  'Películas de terror': 'Horror movies',
+  'Películas de superhéroes': 'Superhero movies',
+  'Sagas de cine': 'Movie franchises',
+  'Películas con animales': 'Movies featuring animals',
+  'Películas de comedia': 'Comedy movies',
+  'Películas de acción': 'Action movies',
+  'Películas de Disney o Pixar': 'Disney or Pixar movies',
+  'Películas románticas': 'Romantic movies',
+  'Películas de ciencia ficción': 'Sci-fi movies',
+
+  // Series
+  'Series de comedia': 'Comedy TV shows',
+  'Series españolas': 'Spanish TV shows',
+  'Series de animación': 'Animated TV shows',
+  'Series con detectives o crímenes': 'Detective or crime shows',
+  'Series de Netflix': 'Netflix shows',
+  'Series de ciencia ficción o fantasía': 'Sci-fi or fantasy shows',
+  'Series de los años 90 o 2000': '90s or 2000s TV shows',
+  'Series de acción': 'Action TV shows',
+  'Series que todo el mundo conoce': 'TV shows everyone knows',
+  'Personajes famosos de series': 'Famous TV show characters',
+
+  // Música
+  'Cantantes españoles': 'Spanish singers',
+  'Grupos musicales': 'Music bands',
+  'Instrumentos musicales': 'Musical instruments',
+  'Canciones de fiesta': 'Party songs',
+  'Géneros musicales': 'Music genres',
+  'Cantantes internacionales': 'International singers',
+  'Canciones en español muy conocidas': 'Well-known songs in Spanish',
+  'Artistas de reguetón o música urbana': 'Reggaeton or urban artists',
+  'Artistas de pop': 'Pop artists',
+  'Festivales o conciertos famosos': 'Famous music festivals',
+
+  // Deportes
+  'Deportes con pelota': 'Ball sports',
+  'Deportes de equipo': 'Team sports',
+  'Deportes acuáticos': 'Water sports',
+  'Deportes olímpicos': 'Olympic sports',
+  'Deportes individuales': 'Individual sports',
+  'Deportes de invierno': 'Winter sports',
+  'Deportes de raqueta o pala': 'Racket sports',
+  'Deportes de motor': 'Motorsports',
+  'Ejercicios de gimnasio': 'Gym exercises',
+  'Accesorios deportivos': 'Sports gear & equipment',
+
+  // Profesiones
+  'Profesiones sanitarias': 'Healthcare jobs',
+  'Trabajos al aire libre': 'Outdoor jobs',
+  'Profesiones con uniforme': 'Jobs with a uniform',
+  'Profesiones creativas': 'Creative jobs',
+  'Trabajos con ordenador': 'Computer-based jobs',
+  'Profesiones de un restaurante': 'Restaurant jobs',
+  'Trabajos de oficina': 'Office jobs',
+  'Profesiones relacionadas con el deporte': 'Sports-related jobs',
+  'Trabajos en un aeropuerto': 'Airport jobs',
+  'Oficios manuales': 'Skilled trades & crafts',
+
+  // Marcas
+  'Marcas de coches': 'Car brands',
+  'Marcas de ropa': 'Clothing brands',
+  'Marcas de móviles o tecnología': 'Phone or tech brands',
+  'Marcas de comida o restaurantes': 'Food or restaurant brands',
+  'Marcas deportivas': 'Sports brands',
+  'Marcas de bebidas': 'Drink brands',
+  'Supermercados y grandes tiendas': 'Supermarkets & big stores',
+  'Marcas de videojuegos': 'Video game brands',
+  'Marcas de perfumes o cosmética': 'Perfume or beauty brands',
+  'Marcas de zapatillas': 'Sneaker brands',
+
+  // Tecnología
+  'Aplicaciones móviles': 'Mobile apps',
+  'Redes sociales': 'Social networks',
+  'Videojuegos': 'Video games',
+  'Dispositivos electrónicos': 'Electronic devices',
+  'Cosas con pantalla': 'Things with a screen',
+  'Páginas web muy visitadas': 'Popular websites',
+  'Accesorios de ordenador': 'Computer accessories',
+  'Plataformas de streaming': 'Streaming platforms',
+  'Cosas que se conectan por Bluetooth': 'Bluetooth devices',
+  'Partes de un móvil o portátil': 'Parts of a phone or laptop',
+
+  // Naturaleza
+  'Tipos de árboles': 'Types of trees',
+  'Flores y plantas': 'Flowers & plants',
+  'Fenómenos meteorológicos': 'Weather phenomena',
+  'Cosas de un bosque': 'Things found in a forest',
+  'Cosas del mar': 'Things found in the sea',
+  'Paisajes naturales': 'Natural landscapes',
+  'Montañas, ríos o mares famosos': 'Famous mountains, rivers, or seas',
+  'Cosas que ves en el cielo': 'Things you see in the sky',
+  'Piedras, minerales o metales': 'Stones, minerals, or metals',
+  'Sonidos de la naturaleza': 'Sounds of nature',
+
+  // Viajes
+  'Cosas de una maleta': 'Things packed in a suitcase',
+  'Medios de transporte': 'Means of transport',
+  'Lugares turísticos famosos': 'Famous tourist landmarks',
+  'Cosas de un aeropuerto': 'Things found at an airport',
+  'Cosas de un hotel': 'Things found in a hotel',
+  'Documentos o cosas para viajar': 'Travel essentials & documents',
+  'Recuerdos o souvenirs': 'Souvenirs',
+  'Tipos de alojamiento': 'Types of accommodation',
+  'Actividades de turista': 'Tourist activities',
+  'Destinos de playa': 'Beach destinations',
+
+  // Casa
+  'Cosas de un baño': 'Things found in a bathroom',
+  'Muebles': 'Furniture',
+  'Electrodomésticos': 'Home appliances',
+  'Cosas de un dormitorio': 'Things found in a bedroom',
+  'Tareas domésticas': 'Household chores',
+  'Habitaciones o zonas de una casa': 'Rooms or areas of a house',
+  'Cosas de un salón': 'Things in a living room',
+  'Productos de limpieza': 'Cleaning products',
+  'Cosas que hay en una nevera': 'Things inside a fridge',
+  'Utensilios para cocinar': 'Cooking utensils',
+
+  // Colegio
+  'Asignaturas': 'School subjects',
+  'Material escolar': 'School supplies',
+  'Cosas del recreo': 'Things from recess',
+  'Lugares de un colegio': 'Places in a school',
+  'Excusas para llegar tarde': 'Excuses for being late',
+  'Juegos de patio': 'Playground games',
+  'Cosas dentro de un estuche': 'Things inside a pencil case',
+  'Tipos de exámenes o trabajos': 'Types of exams or assignments',
+  'Actividades extraescolares': 'After-school activities',
+  'Cosas que hace un profesor': 'Things a teacher does',
+
+  // Fiesta
+  'Bebidas de fiesta': 'Party drinks',
+  'Canciones para bailar': 'Songs to dance to',
+  'Motivos para celebrar': 'Reasons to celebrate',
+  'Cosas que hay en una fiesta': 'Things found at a party',
+  'Juegos de mesa o de grupo': 'Board or party games',
+  'Tipos de celebraciones': 'Types of celebrations',
+  'Cosas de un cumpleaños': 'Birthday essentials',
+  'Lugares donde salir de noche': 'Nightlife spots',
+  'Comida de picoteo': 'Party finger foods',
+  'Disfraces típicos': 'Classic costumes',
+
+  // Famosos
+  'Actores de cine': 'Movie actors',
+  'Deportistas famosos': 'Famous athletes',
+  'Cantantes famosos': 'Famous singers',
+  'Personajes históricos': 'Historical figures',
+  'Presentadores o creadores de contenido': 'TV hosts or content creators',
+  'Actrices famosas': 'Famous actresses',
+  'Personajes de dibujos animados': 'Cartoon characters',
+  'Superhéroes conocidos': 'Well-known superheroes',
+  'Científicos o inventores famosos': 'Famous scientists or inventors',
+  'Artistas o pintores famosos': 'Famous artists or painters',
+
+  // Palabras
+  'Palabras que empiezan por M': 'Words starting with M',
+  'Palabras de cinco letras': 'Five-letter words',
+  'Palabras que acaban en A': 'Words ending in A',
+  'Palabras que empiezan por C': 'Words starting with C',
+  'Palabras de verano': 'Summer words',
+  'Palabras que empiezan por P': 'Words starting with P',
+  'Palabras que acaban en O': 'Words ending in O',
+  'Palabras con tilde': 'Words with a double letter',
+  'Palabras que empiezan por S': 'Words starting with S',
+  'Adjetivos para describir a una persona': 'Adjectives to describe a person',
+
+  // Cuerpo
+  'Partes del cuerpo': 'Body parts',
+  'Huesos del cuerpo': 'Human bones',
+  'Órganos internos': 'Internal organs',
+  'Partes de la cara': 'Parts of the face',
+  'Cosas del cuerpo que tienes dos': 'Body parts you have two of',
+  'Articulaciones': 'Body joints',
+  'Músculos conocidos': 'Well-known muscles',
+  'Partes de un brazo o mano': 'Parts of an arm or hand',
+  'Partes de una pierna o pie': 'Parts of a leg or foot',
+  'Acciones que hace tu cuerpo sin pensar': 'Involuntary body actions',
+
+  // Ropa
+  'Prendas de invierno': 'Winter clothes',
+  'Tipos de calzado': 'Types of footwear',
+  'Accesorios de moda': 'Fashion accessories',
+  'Ropa deportiva': 'Sportswear',
+  'Prendas de verano': 'Summer clothes',
+  'Ropa elegante o de gala': 'Formal wear',
+  'Cosas que se llevan en la cabeza': 'Things worn on the head',
+  'Tejidos y materiales de ropa': 'Clothing fabrics & materials',
+  'Ropa para estar por casa': 'Loungewear',
+  'Colores de ropa habituales': 'Common clothing colors',
+
+  // Vehículos
+  'Marcas de coche': 'Car brands',
+  'Vehículos de dos ruedas': 'Two-wheeled vehicles',
+  'Transportes públicos': 'Public transport',
+  'Vehículos que vuelan': 'Vehicles that fly',
+  'Partes de un coche': 'Car parts',
+  'Vehículos que van por el agua': 'Watercraft & boats',
+  'Vehículos de emergencia o trabajo': 'Emergency or work vehicles',
+  'Cosas que ves en una carretera': 'Things you see on a road',
+  'Señales o elementos de tráfico': 'Traffic signs & road features',
+  'Cosas que llevas en el maletero': 'Things kept in a car trunk',
+
+  // Fantasía
+  'Seres mitológicos': 'Mythological creatures',
+  'Superpoderes': 'Superpowers',
+  'Personajes de cuentos': 'Fairy-tale characters',
+  'Objetos mágicos': 'Magical objects',
+  'Lugares imaginarios o de películas': 'Fictional or movie worlds',
+  'Monstruos famosos': 'Famous monsters',
+  'Dioses de la mitología': 'Gods from mythology',
+  'Criaturas de ciencia ficción': 'Sci-fi creatures',
+  'Sagas de fantasía': 'Fantasy franchises',
+  'Armas o herramientas de fantasía': 'Fantasy weapons or tools',
+
+  // Verano
+  'Cosas de la playa': 'Things found at the beach',
+  'Sabores de helado': 'Ice cream flavors',
+  'Planes de verano': 'Summer plans',
+  'Cosas para protegerse del sol': 'Sun protection items',
+  'Bebidas frías': 'Cold drinks',
+  'Frutas de verano': 'Summer fruits',
+  'Actividades en la piscina': 'Pool activities',
+  'Ropa de verano': 'Summer clothing',
+  'Cosas que molestan en verano': 'Annoying things in summer',
+  'Juegos de playa': 'Beach games',
+
+  // Navidad
+  'Adornos navideños': 'Christmas decorations',
+  'Comidas y dulces de Navidad': 'Christmas foods & sweets',
+  'Regalos típicos': 'Classic gifts',
+  'Villancicos o canciones navideñas': 'Christmas songs',
+  'Cosas que haces en Navidad': 'Things you do at Christmas',
+  'Personajes de Navidad': 'Christmas characters',
+  'Películas de Navidad': 'Christmas movies',
+  'Cosas de la cena de Nochevieja': 'New Year’s Eve essentials',
+  'Propósitos de Año Nuevo': 'New Year’s resolutions',
+  'Cosas típicas del invierno': 'Typical winter things',
+
+  // Special Packs
+  'Excusas para no contestar un mensaje': 'Excuses for not replying to a text',
+  'Mentiras piadosas típicas': 'Classic white lies',
+  'Cosas que nunca dirías en una primera cita':
+      'Things you would never say on a first date',
+  'Cócteles y combinados': 'Cocktails & mixed drinks',
+  'Señales de que la fiesta se ha ido de las manos':
+      'Signs the party got out of hand',
+  'Red flags en una cita': 'Dating red flags',
+  'Planes improvisados de madrugada': 'Spontaneous late-night plans',
+  'Excusas para irte pronto de una fiesta': 'Excuses to leave a party early',
+  'Canciones que todo el mundo canta a gritos': 'Songs everyone screams along to',
+  'Cosas que pierdes cuando sales de fiesta': 'Things people lose on a night out',
+
+  'Sagas de videojuegos': 'Video game franchises',
+  'Personajes icónicos de videojuegos': 'Iconic video game characters',
+  'Consolas de la historia': 'Gaming consoles in history',
+  'Juegos multijugador online': 'Online multiplayer games',
+  'Excusas de gamer cuando pierde': 'Gamer excuses when losing',
+  'Juegos de mundo abierto': 'Open-world video games',
+  'Armas o ítems famosos de videojuegos': 'Famous video game items or weapons',
+  'Juegos de Nintendo': 'Nintendo games',
+  'Juegos de móvil muy populares': 'Popular mobile games',
+  'Cosas que hay en un setup gamer': 'Things in a gaming setup',
+
+  'Directores de cine famosos': 'Famous movie directors',
+  'Villanos de película': 'Movie villains',
+  'Películas ganadoras de un Óscar': 'Oscar-winning movies',
+  'Bandas sonoras inolvidables': 'Unforgettable soundtracks',
+  'Clichés del cine de terror': 'Horror movie clichés',
+  'Películas con giros de guion': 'Movies with plot twists',
+  'Trilogías famosas': 'Famous movie trilogies',
+  'Películas basadas en libros': 'Movies based on books',
+  'Películas de los años 80 o 90': '80s or 90s movies',
+  'Frases míticas del cine': 'Iconic movie quotes',
+
+  'Equipos de fútbol europeos': 'European football clubs',
+  'Futbolistas legendarios': 'Legendary footballers',
+  'Estadios famosos': 'Famous stadiums',
+  'Selecciones campeonas del mundo': 'World Cup winning nations',
+  'Cosas que grita un entrenador': 'Things a coach yells',
+  'Equipos de LaLiga': 'LaLiga teams',
+  'Porteros famosos': 'Famous goalkeepers',
+  'Entrenadores conocidos': 'Well-known football managers',
+  'Posiciones o jugadas de fútbol': 'Football positions or plays',
+  'Competiciones de fútbol': 'Football competitions',
+
+  // Loser Dares
+  'Imita a tu cantante favorito durante 10 segundos.':
+      'Imitate your favorite singer for 10 seconds.',
+  'Habla con acento extranjero hasta que termine la próxima ronda.':
+      'Speak with a foreign accent until the next round ends.',
+  'Cuenta una anécdota graciosa en menos de 15 segundos.':
+      'Tell a funny story in under 15 seconds.',
+  'Haz 5 sentadillas antes de empezar la siguiente ronda.':
+      'Do 5 squats before the next round starts.',
+  'Di un trabalenguas rápido sin equivocarte.':
+      'Say a fast tongue twister without messing up.',
+  'Elige a alguien del grupo para que invente la próxima categoría.':
+      'Pick someone in the group to choose the next category.',
+  'Canta el estribillo de la última canción que escuchaste.':
+      'Sing the chorus of the last song you listened to.',
+  'Aplaude y anima a cada jugador en la siguiente ronda.':
+      'Clap and cheer for every player during the next round.',
+  'Haz tu mejor cara de susto para una foto grupal imaginaria.':
+      'Make your best shocked face for an imaginary group photo.',
+  'Nombra 3 cosas buenas de la persona a tu derecha.':
+      'Name 3 nice things about the person to your right.',
+};
+
+String localizedContent(BuildContext context, String value) {
+  if (Localizations.localeOf(context).languageCode != 'en') return value;
+  return englishContent(value);
+}
+
+String englishContent(String value) => _contentEn[value] ?? value;

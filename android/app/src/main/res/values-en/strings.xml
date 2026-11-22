@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">The Bomb</string>
+    <string name="reminder_channel_name">Game reminders</string>
+    <string name="reminder_channel_description">Reminders to gather the group and play The Bomb</string>
+    <string name="reminder_title">💣 Ready to play The Bomb?</string>
+    <string name="reminder_message">Put the phone in the middle and let the fun begin.</string>
+</resources>
