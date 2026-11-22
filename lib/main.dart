@@ -2879,14 +2879,25 @@ class BombShopScreen extends StatelessWidget {
                   color: colors.surface,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
-                    color: isEquipped ? yellow : colors.outline,
-                    width: isEquipped ? 2 : 1,
+                    color: isEquipped
+                        ? yellow
+                        : skin.glowColor.withValues(alpha: 0.42),
+                    width: isEquipped ? 2 : 1.2,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: (isEquipped ? yellow : skin.glowColor).withValues(
+                        alpha: isEquipped ? 0.28 : 0.16,
+                      ),
+                      blurRadius: isEquipped ? 18 : 14,
+                      spreadRadius: 0.5,
+                    ),
+                  ],
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    BombImage(size: 86, skin: skin),
+                    BombImage(size: 92, skin: skin),
                     Text(
                       skin.localizedName(context),
                       maxLines: 1,
@@ -3705,43 +3716,13 @@ class BombImage extends StatelessWidget {
   final BombSkin skin;
 
   @override
-  Widget build(BuildContext context) {
-    if (skin == BombSkin.classic) {
-      return Image.asset(
-        skin.assetPath,
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
-        filterQuality: FilterQuality.high,
-      );
-    }
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: ink,
-        border: Border.all(
-          color: skin.glowColor.withValues(alpha: 0.55),
-          width: size > 60 ? 2 : 1.2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: skin.glowColor.withValues(alpha: 0.28),
-            blurRadius: size * 0.18,
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Image.asset(
-        skin.assetPath,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        filterQuality: FilterQuality.high,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Image.asset(
+    skin.assetPath,
+    width: size,
+    height: size,
+    fit: BoxFit.contain,
+    filterQuality: FilterQuality.high,
+  );
 }
 
 class Header extends StatelessWidget {
